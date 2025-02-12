@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  password      String
+  posts         Post[]
+}
+
+model Post {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  company       Company         @relation(fields: [companyId], references: [id])
+  companyId     Int
+  address       String?
+  city          City            @relation(fields: [cityId], references: [id])
+  cityId        Int
+  postalCode    PostalCode      @relation(fields: [postalCodeId], references: [id])
+  postalCodeId  Int
+  country       Country         @relation(fields: [countryId], references: [id])
+  countryId     Int
+  salary        Int
+  author        User            @relation(fields: [authorId], references: [id])
+  authorId      Int
+  applications  Application[]
+}
+
+model Company {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  posts         Post[]
+}
+
+model Application {
+  id            Int             @id @default(autoincrement())
+  name          String
+  email         String
+  resume        String          // String = url
+  posts         Post            @relation(fields: [postId], references: [id])
+  postId        Int
+}
+
+model City {
+  id            Int             @id @default(autoincrement())
+  name          String
+  postalCode    PostalCode      @relation(fields: [postalCodeId], references: [id])
+  postalCodeId  Int
+  country       Country         @relation(fields: [countryId], references: [id])
+  countryId     Int
+  posts         Post[]
+}
+
+model PostalCode {
+  id            Int             @id @default(autoincrement())
+  postalCode    Int             // @unique /* The same code can be used by differents country? */
+  cities        City[]
+  country       Country         @relation(fields: [countryId], references: [id])
+  countryId     Int
+  posts         Post[]
+}
+
+model Country {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  cities        City[]
+  postalCode    PostalCode[]
+  posts         Post[]
+}
