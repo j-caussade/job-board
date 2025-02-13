@@ -1,8 +1,50 @@
+"use client";
+
+import { useState } from "react";
+
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setCookie("token", data.token, 5);
+        console.log("Successful connection", data.message);
+      } else {
+        setError(data.error || "An error has occurred");
+      }
+    } catch (error) {
+      setError("Network error, please try again");
+    }
+  };
+
+  const setCookie = (name: string, value: string, days: number) => {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 1000);
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  };
+
   return (
     <main className="flex flex-col items-center gap-4">
       <h1 className="text-5xl font-bold">Log in</h1>
-      <form action="" className="flex flex-col gap-4 w-80">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
         <label className="input input-bordered flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -13,7 +55,13 @@ export default function Login() {
             <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
             <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
           </svg>
-          <input type="text" className="grow" placeholder="Email" />
+          <input
+            type="email"
+            className="grow"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         <label className="input input-bordered flex items-center gap-2">
           <svg
@@ -28,8 +76,15 @@ export default function Login() {
               clipRule="evenodd"
             />
           </svg>
-          <input type="password" className="grow" /* value="password" */ />
+          <input
+            type="password"
+            className="grow"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </label>
+        {error && <p className="text-red-500">{error}</p>}
         <input type="submit" className="btn btn-primary" value="Log in" />
       </form>
     </main>

@@ -1,8 +1,40 @@
+"use client";
+
+import { useState } from "react";
+
 export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("User created successfully", data.message);
+      } else {
+        setError(data.error || "An error has occurred");
+      }
+    } catch (error) {
+      setError("Network error, please try again");
+    }
+  };
+
   return (
     <main className="flex flex-col items-center gap-4">
       <h1 className="text-5xl font-bold">Register</h1>
-      <form action="" className="flex flex-col gap-4 w-80">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
         <label className="input input-bordered flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +44,13 @@ export default function Register() {
           >
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
           </svg>
-          <input type="text" className="grow" placeholder="Company name" />
+          <input
+            type="text"
+            className="grow"
+            placeholder="Company name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </label>
         <label className="input input-bordered flex items-center gap-2">
           <svg
@@ -24,7 +62,13 @@ export default function Register() {
             <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
             <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
           </svg>
-          <input type="text" className="grow" placeholder="Email" />
+          <input
+            type="email"
+            className="grow"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         <label className="input input-bordered flex items-center gap-2">
           <svg
@@ -39,7 +83,13 @@ export default function Register() {
               clipRule="evenodd"
             />
           </svg>
-          <input type="password" className="grow" /* value="password" */ />
+          <input
+            type="password"
+            className="grow"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </label>
         <input type="submit" className="btn btn-primary" value="Register" />
       </form>

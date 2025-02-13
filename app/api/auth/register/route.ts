@@ -15,26 +15,26 @@ type DecodedToken = {
 
 export async function POST(request: Request) {
   try {
-    // Check if the user is authenticated
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer")) {
-      return NextResponse.json({ error: "Access denied" }, { status: 401 });
-    }
-    // Extract the token
-    const token = authHeader.split(" ")[1];
-    // Verify the token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_key");
-    } catch (error) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 403 });
-    }
+    // // Check if the user is authenticated
+    // const authHeader = request.headers.get("Authorization");
+    // if (!authHeader || !authHeader.startsWith("Bearer")) {
+    //   return NextResponse.json({ error: "Access denied" }, { status: 401 });
+    // }
+    // // Extract the token
+    // const token = authHeader.split(" ")[1];
+    // // Verify the token
+    // let decoded;
+    // try {
+    //   decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_key");
+    // } catch (error) {
+    //   return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+    // }
 
-    decoded = decoded as DecodedToken;
-    if (decoded.role !== "admin") {
-      console.log(decoded.role);
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
+    // decoded = decoded as DecodedToken;
+    // if (decoded.role !== "admin") {
+    //   console.log(decoded.role);
+    //   return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    // }
 
     const { email, password, name, role, isValidated } = await request.json();
 
